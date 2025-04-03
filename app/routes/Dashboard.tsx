@@ -1,38 +1,26 @@
 import { useState } from "react";
 import withAuth from "~/utils/apiLogin/auth";
-import { LucideIcon, Home, SquareStack, TicketCheck, UserSearch, Wrench, Power, Settings, Menu, Search, ChevronDown, ChevronUp, } from "lucide-react";
 import { Sidebar } from "~/components/sidebar";
 import { Navbar } from "~/components/navbar";
 import RecentTickets from "~/components/dashboard/ticketsrecientes";
 import TicketCounter from "~/components/dashboard/ticketCounter";
 import { Calendar } from "~/components/dashboard/calendario";
 import TicketDashboard from "~/components/dashboard/contadortickets";
-import { ticketsData } from "~/utils/tickatsData";
+import { Ticket } from "~/utils/apiTickets/ticket";
 
 function DashboardLayout() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
-  const [tickets, setTickets] = useState(ticketsData);  // Usas los datos importados
   const [currentPage, setCurrentPage] = useState(1); // Paginación
   const itemsPerPage = 5;
   const pageTitle = "Dashboard";
-  const filteredTickets = tickets.filter((ticket) =>
-    ticket.problema.toLowerCase().includes(search.toLowerCase()) ||
-    ticket.cliente.toLowerCase().includes(search.toLowerCase()) ||
-    ticket.asset.toLowerCase().includes(search.toLowerCase()) ||
-    ticket.tecnico.toLowerCase().includes(search.toLowerCase())
-  );
-  const sortedTickets = [...filteredTickets].sort((a, b) => { // Ordenar
-    const dateA = new Date(a.fecha).getTime();
-    const dateB = new Date(b.fecha).getTime();
-    return sortAsc ? dateA - dateB : dateB - dateA;
-  });
-  const totalPages = Math.max(Math.ceil(sortedTickets.length / itemsPerPage), 1); // Cálculo paginación
-  const currentTickets = sortedTickets.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+
+
+  const totalPages = Math.max(Math.ceil(tickets.length / itemsPerPage), 1); // Cálculo paginación
+
   const nextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
@@ -49,7 +37,7 @@ function DashboardLayout() {
   const handleStatusChange = (ticketId: number, newStatus: string) => {
     setTickets((prevTickets) =>
       prevTickets.map((ticket) =>
-        ticket.id === ticketId ? { ...ticket, status: newStatus } : ticket
+        ticket.idTicket === ticketId ? { ...ticket, status: newStatus } : ticket
       )
     );
   };
